@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SportsPro - Ground Booking</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Russo+One&display=swap");
+
+      :root {
+        --primary: #ff4d4d;
+        --secondary: #1a1a1a;
+        --accent: #ffd700;
+        --text: #ffffff;
+        --background: #0a0a0a;
+        --card-bg: rgba(255, 255, 255, 0.05);
+        --success: #4caf50;
+        --warning: #ffc107;
+        --danger: #f44336;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background-color: var(--background);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .sidebar {
+        width: 250px;
+        background: var(--secondary);
+        padding: 2rem 1rem;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        height: 100vh;
+      }
+
+      .sidebar-logo {
+        font-family: "Russo One", sans-serif;
+        font-size: 1.5rem;
+        color: var(--primary);
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .nav-item {
+        padding: 0.8rem 1rem;
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .nav-item:hover,
+      .nav-item.active {
+        background: var(--primary);
+      }
+
+      .nav-item i {
+        width: 20px;
+      }
+
+      .main-content {
+        flex: 1;
+        margin-left: 250px;
+        padding: 2rem;
+      }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .booking-container {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-top: 2rem;
+      }
+
+      .date-picker input[type="date"] {
+        background: var(--secondary);
+        border: none;
+        padding: 0.8rem;
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 1rem;
+      }
+
+      .time-slots-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .time-slot {
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .time-slot.available {
+        background-color: green;
+        color: white;
+        cursor: pointer;
+      }
+
+      .time-slot.booked {
+        background-color: red;
+        color: white;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      .time-slot.selected {
+        background-color: #f2f1ee;
+        color: rgb(6, 6, 6);
+        cursor: pointer;
+      }
+      .time-slot.pending {
+        background-color: #ffac07;
+        color: white;
+        cursor: pointer;
+      }
+      .ground-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+      .ground-image {
+            width: 200px;
+            height: 150px;
+            background: var(--secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ground-details h2 {
+            margin-bottom: 0.5rem;
+        }
+      .legend {
+        display: flex;
+        gap: 2rem;
+        margin-top: 1rem;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+      }
+
+      .legend-color.available {
+        background: var(--success);
+      }
+
+      .legend-color.booked {
+        background: var(--danger);
+      }
+      .legend-color.selected {
+        background-color:#f2f1ee ;
+      }
+      .time-slot.available {
+          background-color: green;
+          color: white;
+          cursor: pointer;
+      }
+
+      .time-slot.booked {
+          background-color: red;
+          color: white;
+          cursor: not-allowed;
+          opacity: 0.7;
+      }
+
+      .time-slot.pending {
+          background-color: #ffac07;
+          color: white;
+          cursor: not-allowed;
+          opacity: 0.7;
+      }
+
+      .time-slot.selected {
+          background-color: #f2f1ee;
+          color: rgb(6, 6, 6);
+          cursor: pointer;
+      }
+
+      /* Update the legend to include pending status */
+      .legend-color.pending {
+          background-color: #ffac07;
+      }
+
+
+
+      @media (max-width: 768px) {
+        .sidebar {
+          width: 70px;
+          padding: 1rem 0.5rem;
+        }
+
+        .sidebar-logo,
+        .nav-item span {
+          display: none;
+        }
+
+        .main-content {
+          margin-left: 70px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="bookingPage" style="display: flex; width: 100%">
+      <aside class="sidebar">
+        <div class="sidebar-logo">SportsPro</div>
+        <nav class="sidebar-nav">
+          <a href="/user/dashboard" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="/findgrounds" class="nav-item">
+            <i class="fas fa-search"></i>
+            <span>Find Grounds</span>
+          </a>
+          <a href="#" class="nav-item active">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Bookings</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+          <a href="/logout" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <div class="dashboard-header">
+          <h1>Book Ground</h1>
+        </div>
+
+        <div class="booking-container">
+            <div class="ground-info">
+                <div class="ground-image">
+                    <i class="fas fa-futbol fa-3x" style="opacity: 0.5;"></i>
+                </div>
+                <div class="ground-details">
+                    <input type="hidden" id="ground-id" value="{{ ground._id }}">
+                    <h2>{{ground.groundname}}</h2>
+                    <p>Location: {{ground.address}},{{ground.city}}  City </p>
+                    <p>Price: ₹{{ground.costperhour}} per hour</p>
+                </div>
+            </div>
+
+          <div class="date-picker">
+            <h3>Select Date</h3>
+            <input type="date" id="booking-date" min="2024-11-15" />
+          </div>
+
+          <div class="time-slots">
+            <h3>Available Time Slots</h3>
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-color available"></div>
+                <span>Available</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color booked"></div>
+                <span>Booked</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color pending"></div>
+                <span>Pending</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color selected"></div>
+                <span>Selected</span>
+              </div>
+            </div>
+            <div class="time-slots-grid">
+              <!-- Slots will be dynamically loaded here -->
+              
+            </div>
+            <div style="text-align: center; margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;">
+              <button id="book-now-btn" style="background: var(--primary); border: none; padding: 1rem 2rem; color: var(--text); font-size: 1rem; border-radius: 8px; cursor: pointer;">
+                  Book Selected Slots
+              </button>
+              <button id="book-full-day-btn" style="background: var(--accent); border: none; padding: 1rem 2rem; color: var(--secondary); font-size: 1rem; border-radius: 8px; cursor: pointer;">
+                  Book Full Day
+              </button>
+          </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      let selectedSlots = [];
+
+      async function fetchAndUpdateSlots(date) {
+            const groundId = document.getElementById("ground-id").value;
+
+            try {
+                const response = await fetch(`/ground/${groundId}/slots?date=${date}`);
+                if (!response.ok) throw new Error("Failed to fetch slots");
+
+                const slots = await response.json();
+                const slotsGrid = document.querySelector(".time-slots-grid");
+                slotsGrid.innerHTML = "";
+
+                slots.forEach((slot) => {
+                    const slotElement = document.createElement("div");
+                    
+                    // Modify status handling to distinguish between booked and pending
+                    let slotStatus = slot.status;
+                    slotElement.classList.add("time-slot", slotStatus);
+                    
+                    slotElement.textContent = slot.time;
+                    slotElement.setAttribute("data-time", slot.time);
+
+                    // Add click event only for available slots
+                    if (slotStatus === "available") {
+                        slotElement.addEventListener("click", () => handleSlotSelection(slotElement));
+                    }
+
+                    slotsGrid.appendChild(slotElement);
+                });
+            } catch (error) {
+                console.error("Error fetching slots:", error);
+                alert("Failed to fetch available slots. Please try again later.");
+            }
+        }
+
+        function handleSlotSelection(slotElement) {
+            const time = slotElement.getAttribute("data-time");
+
+            if (selectedSlots.includes(time)) {
+                selectedSlots = selectedSlots.filter((t) => t !== time);
+                slotElement.classList.remove("selected");
+            } else {
+                selectedSlots.push(time);
+                slotElement.classList.add("selected");
+            }
+        }
+
+        document.getElementById("book-now-btn").addEventListener("click", async () => {
+            if (selectedSlots.length === 0) {
+                alert("Please select at least one slot.");
+                return;
+            }
+
+            const date = document.getElementById("booking-date").value;
+            const groundId = document.getElementById("ground-id").value;
+
+            if (!date || !groundId) {
+                alert("Invalid booking details. Please try again.");
+                return;
+            }
+
+            const bookingRequests = selectedSlots.map((time) => {
+                return fetch("/book-slot", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        ground_id: groundId,
+                        time_slot: time,
+                        booking_date: date,
+                    }),
+                });
+            });
+
+            try {
+                const responses = await Promise.all(bookingRequests);
+                const results = await Promise.all(responses.map((res) => res.json()));
+
+                let successCount = 0;
+                let errorCount = 0;
+
+                results.forEach((result, index) => {
+                    const time = selectedSlots[index];
+                    if (result.success) {
+                        successCount++;
+                        document.querySelectorAll(".time-slot").forEach((slot) => {
+                            if (slot.getAttribute("data-time") === time) {
+                                slot.classList.remove("available");
+                                slot.classList.add("pending");
+                            }
+                        });
+                    } else {
+                        errorCount++;
+                    }
+                });
+
+                // Display appropriate alert
+                if (successCount > 0) {
+                    alert(`Booking successful for ${successCount} slot(s)!`);
+                }
+                if (errorCount > 0) {
+                    alert(`Booking successful for ${errorCount} slot(s)!`);
+                }
+
+                selectedSlots = [];
+                document.querySelectorAll(".time-slot.selected").forEach((slot) => {
+                    slot.classList.remove("selected");
+                });
+
+                // Refresh slots to reflect new status
+                fetchAndUpdateSlots(date);
+            } catch (error) {
+                console.error("Error booking slots:", error);
+                alert("An error occurred while booking slots.");
+            }
+        });
+
+        // Set up initial date and fetch slots
+        const today = new Date().toISOString().split("T")[0];
+        const bookingDateElement = document.getElementById("booking-date");
+        bookingDateElement.min = today;
+        bookingDateElement.value = today;
+
+        bookingDateElement.addEventListener("change", (event) => {
+            const selectedDate = event.target.value;
+            if (selectedDate) fetchAndUpdateSlots(selectedDate);
+      });
+        // Add this to your existing JavaScript
+      document.getElementById("book-full-day-btn").addEventListener("click", async () => {
+            const date = document.getElementById("booking-date").value;
+            const groundId = document.getElementById("ground-id").value;
+            console.log(date)
+            console.log(groundId)
+            try {
+                // First, check the availability of all slots for the day
+                const availabilityResponse = await fetch(`/ground/${groundId}/check-full-day-availability?date=${date}` , { method: 'GET' });
+                const availabilityData = await availabilityResponse.json();
+
+                if (!availabilityData.is_available) {
+                    alert("Cannot book full day. Some slots are already booked or pending.");
+                    return;
+                }
+
+                // If all slots are available, proceed with full-day booking
+                const bookFullDayResponse = await fetch("/book-full-day", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        ground_id: groundId,
+                        booking_date: date
+                    })
+                });
+
+                const result = await bookFullDayResponse.json();
+
+                if (result.success) {
+                    alert("Full day booking successful!");
+                    // Refresh slots to reflect new status
+                    fetchAndUpdateSlots(date);
+                } else {
+                    alert(result.message || "Failed to book full day.");
+                }
+
+            } catch (error) {
+                console.error("Error booking full day:", error);
+                alert("An error occurred while booking the full day.");
+            }
+      });
+        // Initial fetch of slots for today
+      fetchAndUpdateSlots(today);
+    </script>
+  </body>
+</html>
